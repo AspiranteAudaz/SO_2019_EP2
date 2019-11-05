@@ -1,0 +1,4 @@
+class Recurso
+{
+    String valor;
+}
