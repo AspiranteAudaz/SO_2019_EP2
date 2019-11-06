@@ -28,41 +28,32 @@ public class ES
         }
     }
 
-    Vector<String> ParsaLinhas(char[] buffer)
+    Vector<String> ParsaPalavras(char[] buffer)
     {
-        Vector<String> linhas = new Vector<String>();
+        Vector<String> palavras = new Vector<String>();
         
         //Uma linha
-        String linha = "";
+        String palavra = "";
 
         for(int i = 0; i < buffer.length; i++)
         {
-            //Testa se e nova linha, carriage return ou line feed
-            if(buffer[i] == '\n' || buffer[i] == '\f' || buffer[i] == '\r')
+            //Testa se e espaco, nova linha, carriage return ou line feed
+            if(buffer[i] == ' ' || buffer[i] == '\n' || buffer[i] == '\f' || buffer[i] == '\r')
             {
-                if(linha.length() > 0)
+                if(palavra.length() > 0)
                 {
-                    linhas.addElement(linha.toUpperCase());
-                    linha = "";
+                    palavras.addElement(palavra.toUpperCase());
+                    palavra = "";
                 }
 
                 continue;
             }
             
             //Concatena valor
-            linha += buffer[i];
+            palavra += buffer[i];
         }
 
-        return linhas;
-    }
-
-    private File[] ListaArquivos(String path)
-    {
-        File     diretorio = new File(path);
-        File[]   processos = diretorio.listFiles();
-        Arrays.sort(processos);
-
-        return processos;
+        return palavras;
     }
 
     char[] CarregaArquivo(String path)

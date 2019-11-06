@@ -1,18 +1,10 @@
-import java.util.Random;
-
 class Agente
 {
 
-    final boolean ESCRITOR = true;
-    final boolean LEITOR   = false;
+    static final boolean ESCRITOR = true;
+    static final boolean LEITOR   = false;
 
     final boolean tipo;
-
-    Agente()
-    {
-        //Tem que ser random
-        tipo = LEITOR;
-    }
 
     Agente(boolean tipo)
     {
