@@ -1,16 +1,23 @@
+import java.util.Vector;
+
 class Simula
 {
     Agente agentes[];
+    ES es = new ES();
 
-    Simula(int num_agentes, int num_recursos)
+    Simula(String entrada, String saida, int num_agentes)
     {
-        Area critica = new Area(num_recursos);
-        GeraAgentes(num_agentes);
-    }
+        //Le as linhas do arquivo
+        Vector<String> linhas = es.ParsaLinhas(es.CarregaArquivo(entrada));
+        
+        //Gera os objetos de recurso
+        Recurso[] recursos = new Recurso[linhas.size()];
+        for(int i = 0; i < recursos.length; i++)
+            recursos[i] = new Recurso(linhas.remove(0));
 
-    Simula(int num_agentes, Recurso[] recursos)
-    {
         Area critica = new Area(recursos);
+
+        //Gera os agentes
         GeraAgentes(num_agentes);
     }
 
