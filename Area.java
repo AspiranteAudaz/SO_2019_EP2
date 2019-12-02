@@ -3,19 +3,56 @@ import java.util.ArrayList;
 
 class Area
 {
+    static final char SEM_LE  = 'S';
+    static final char IMP_01  = '1';
+    static final char IMP_02  = '2';
+    static final int  ACESSOS = 100;
+    char IMPLEMENTACAO;
+
     private Recurso  buffer[];
     private Random   alea = new Random();
-    int leitores = 0;
-    int escritor = 0;
     ArrayList<Estrutura> log;
+    boolean escritores = false;
+    int     leitores   = 0;
 
-    Area(int num_recursos)
+    void Log(String val)
     {
+        System.out.println(val);
+    }
+
+    void LogL(String name)
+    {
+        long   ltime = System.currentTimeMillis();
+        String time  = ltime + "";
+        log.add(new Estrutura(name + " LOCK [" + time.substring(time.length() - 6, time.length()) + "]", ltime));
+        //Log(name + " LOCK [" + time.substring(time.length() - 6, time.length()) + "]");
+    }
+
+    void LogC(String name)
+    {
+        long   ltime = System.currentTimeMillis();
+        String time  = ltime + "";
+        log.add(new Estrutura(name + " Chegou [" + time.substring(time.length() - 6, time.length()) + "]", ltime));
+        //Log(name + " CHEGOU [" + time.substring(time.length() - 6, time.length()) + "]");
+    }
+
+    void LogS(String name)
+    {
+        long   ltime = System.currentTimeMillis();
+        String time  = ltime + "";
+        log.add(new Estrutura(name + " Saida [" + time.substring(time.length() - 6, time.length()) + "]", ltime));
+        //Log(name + " Saida [" + time.substring(time.length() - 6, time.length()) + "]");
+    }
+
+    Area(int num_recursos, char implementacao)
+    {
+        this.IMPLEMENTACAO = implementacao;
         buffer = new Recurso[num_recursos];
     }
 
-    Area(Recurso buffer[])
+    Area(Recurso buffer[], char implementacao)
     {
+        this.IMPLEMENTACAO = implementacao;
         this.buffer = buffer;
     }
 
@@ -24,20 +61,118 @@ class Area
         return alea.nextInt(buffer.length);
     }
 
-    Recurso Le(int pos) throws Exception
+    boolean PodeLer()
     {
-        if(pos >= buffer.length)
-            throw new Exception("Pos nao cai dentro do buffer.");
-
-        return buffer[pos];
+        if(IMPLEMENTACAO == '1')
+        {
+            return (!escritores);
+        }
+        else if(IMPLEMENTACAO == '2')
+        {
+            return (!escritores);
+        }
+        else
+        {
+            //SEM LE
+            return true;
+        }
     }
 
-    void Escreve(Recurso rec, int pos) throws Exception
+    boolean PodeEscrever()
     {
-        if(pos >= buffer.length)
-            throw new Exception("Pos nao cai dentro do buffer.");
+        if(IMPLEMENTACAO == '1')
+        {
+            return ((leitores == 0) && (!escritores));
+        }
+        else if(IMPLEMENTACAO == '2')
+        {
+            return (!escritores);
+        }
+        else
+        {
+            //SEM LE
+            return true;
+        }
+    }
 
-        buffer[pos] = rec;
+    void LeDesync()
+    {
+        Recurso rec;
+        try
+        {   
+            for(int i = 0; i < ACESSOS; i++)
+                rec = buffer[NextPos()];
+        }
+        catch(Exception ex)
+        {
+            System.out.println(ex.toString());
+        }
+    }
+
+    void EscreveDesync(Recurso rec)
+    {   
+        try
+        {
+            for(int i = 0; i < ACESSOS; i++)
+                buffer[NextPos()] = rec;
+        }
+        catch(Exception ex)
+        {
+            System.out.println(ex.toString());
+        }
+    }
+
+    synchronized void Le(String name) throws Exception
+    {
+        LogC(name);
+
+        while (!PodeLer()) 
+        {
+            try 
+            {
+                wait();
+            } catch (InterruptedException e) 
+            {
+                e.printStackTrace();
+            }
+        }
+        leitores++;
+
+        LeDesync();
+    }
+
+    synchronized void Escreve(Recurso rec, String name) throws Exception
+    {
+        LogC(name);
+
+        while (!PodeEscrever()) 
+        {
+            try 
+            {
+                wait();
+            } catch (InterruptedException e) 
+            {
+                e.printStackTrace();
+            }
+        }
+        
+        escritores = true;
+    
+        EscreveDesync(rec);
+    }
+
+    synchronized void PararLer(String name)
+    {
+        leitores--;
+        LogS(name);
+        notifyAll();
+    }
+
+    synchronized void PararEscrever(String name)
+    {
+        escritores = false;
+        LogS(name);
+        notifyAll();
     }
 
     void ordenaEPrinta()

@@ -12,14 +12,14 @@ class Simula
 
     private String entrada;
 
-    Simula(String entrada)
+    Simula(String entrada, char implementacao)
     {
         //Le os recursos do arquivo de entrada
-        PegaRecursos(entrada);
+        PegaRecursos(entrada, implementacao);
     }
 
     //Carrega a area critica com o arquivo
-    private void PegaRecursos(String entrada)
+    private void PegaRecursos(String entrada, char implementacao)
     {
         //Le as linhas do arquivo
         Vector<String> linhas = es.ParsaPalavras(es.CarregaArquivo(entrada));
@@ -32,7 +32,7 @@ class Simula
         for(int i = 0; i < recursos.length; i++)
             recursos[i] = new Recurso(linhas.remove(0));
 
-        critica = new Area(recursos);
+        critica = new Area(recursos, implementacao);
     }
 
     //Popula vetor agentes
@@ -87,6 +87,9 @@ class Simula
         {
             System.out.println(ex.toString());
         }
+
+        critica.leitores   = 0;
+        critica.escritores = false;
 
         long era_final = System.currentTimeMillis();
 

@@ -2,14 +2,12 @@ import java.util.ArrayList;
 
 class Agente extends Thread
 {
-
     static final boolean ESCRITOR     = true;
     static final boolean LEITOR       = false;
     static final String  ESCRITOR_STR = "ESCRITOR";
     static final String  LEITOR_STR   = "LEITOR";
     static final String  DADO_ESCREVE = "MODIFICADO";
     static final int     SLEEP_TIME   = 1;
-    static final int     ACESSOS      = 100;
 
     ArrayList<Estrutura> log;
     private final boolean tipo;
@@ -41,161 +39,91 @@ class Agente extends Thread
         return tipo;
     }
 
-    void Escreve(Recurso rec, int pos) throws Exception
-    {
-        if(!tipo)
-            throw new Exception("Este agente nao e um escritor.");
-
-        try
-        {
-            for(int i = 0; i < ACESSOS; i++)
-                area.Escreve(rec, pos);
-        }
-        catch(Exception ex)
-        {
-            System.out.println(ex.toString());
-        }
-    }
-
-    void Le(int pos) throws Exception
-    {
-        if(tipo)
-            throw new Exception("Este agente nao e um leitor.");
-
-        try
-        {   
-            for(int i = 0; i < ACESSOS; i++)
-                area.Le(pos);
-        }
-        catch(Exception ex)
-        {
-            System.out.println(ex.toString());
-        }
-    }
-
     void LogL()
     {
-        long   ltime = System.currentTimeMillis();
-        String time  = ltime + "";
-        //area.log.add(new Estrutura(name + " LOCK [" + time.substring(time.length() - 6, time.length()) + "]", ltime));
+        area.LogS(name);
     }
 
     void LogC()
     {
-        long   ltime = System.currentTimeMillis();
-        String time  = ltime + "";
-        //area.log.add(new Estrutura(name + " Chegou [" + time.substring(time.length() - 6, time.length()) + "]", ltime));
+        area.LogS(name);
     }
 
     void LogS()
     {
-        long   ltime = System.currentTimeMillis();
-        String time  = ltime + "";
-        //area.log.add(new Estrutura(name + " Saida [" + time.substring(time.length() - 6, time.length()) + "]", ltime));
+        area.LogS(name);
     }
 
     //Implementacao sem LE
     public void SemLE()
     {
-        LogL();
+        //LogL();
         synchronized(area)
         {
             if(tipo)
             {
-                LogC();
+                //LogC();
                 try
                 {
-                    Escreve(rec, area.NextPos());
+                    area.EscreveDesync(rec);
                     try{Thread.sleep(SLEEP_TIME);}catch(Exception ex){System.out.println(ex.toString());};
                 }
                 catch(Exception ex)
                 {
                     System.out.println(ex.toString());
                 }
-                LogS();
+                //LogS();
             }
             else
             {
-                LogC();
+                //LogC();
                 try
                 {
-                    Le(area.NextPos());
+                    area.LeDesync();
                     try{Thread.sleep(SLEEP_TIME);}catch(Exception ex){System.out.println(ex.toString());};
                 }
                 catch(Exception ex)
                 {
                     System.out.println(ex.toString());
                 }
-                LogS();
-            }
-        }
-    }
-
-    public void ComLE_I()
-    {
-        if(tipo)
-        {
-            LogL();
-            synchronized(area)
-            {
-                LogC();
-                try
-                {
-                    Escreve(rec, area.NextPos());
-                    try{Thread.sleep(SLEEP_TIME);}catch(Exception ex){System.out.println(ex.toString());};
-                }
-                catch(Exception ex)
-                {
-                    System.out.println(ex.toString());
-                }
-                LogS();
-            }
-        }
-        else
-        {
-            if(area.leitores == 0)
-            {
-                LogL();
-                synchronized(area)
-                {
-                    area.leitores++;
-                    LogC();
-                    try
-                    {
-                        Le(area.NextPos());
-                        try{Thread.sleep(SLEEP_TIME);}catch(Exception ex){System.out.println(ex.toString());};
-                    }
-                    catch(Exception ex)
-                    {
-                        System.out.println(ex.toString());
-                    }
-                    LogS();
-                    area.leitores--;
-                }
-            }
-            else
-            {
-                area.leitores++;
-                LogC();
-                try
-                {
-                    Le(area.NextPos());
-                    try{Thread.sleep(SLEEP_TIME);}catch(Exception ex){System.out.println(ex.toString());};
-                }
-                catch(Exception ex)
-                {
-                    System.out.println(ex.toString());
-                }
-                LogS();
-                area.leitores--;
+                //LogS();
             }
         }
     }
 
     public void run()
     {
-        //SemLE();
-        ComLE_I();
-        //System.out.println(name + " terminou.");
+        if(area.IMPLEMENTACAO == area.SEM_LE)
+        {
+            SemLE();
+            return;
+        }
+
+        if(tipo)
+        {
+            try
+            {
+                area.Escreve(rec, name);
+                try{Thread.sleep(SLEEP_TIME);}catch(Exception ex){System.out.println(ex.toString());};
+                area.PararEscrever(name);
+            }
+            catch(Exception ex)
+            {
+                System.out.println(ex.toString());
+            }
+        }
+        else
+        {
+            try
+            {
+                area.Le(name);
+                try{Thread.sleep(SLEEP_TIME);}catch(Exception ex){System.out.println(ex.toString());};
+                area.PararLer(name);
+            }
+            catch(Exception ex)
+            {
+                System.out.println(ex.toString());
+            }
+        }
     }
 }
