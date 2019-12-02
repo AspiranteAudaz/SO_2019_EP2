@@ -1,11 +1,12 @@
 import java.util.Vector;
 import java.util.Random;
+import java.util.ArrayList;
 
 class Simula
 {
     private ES es       = new ES();
     private Random alea = new Random();
-
+    
     private Agente agentes[];
     private Area   critica;
 
@@ -72,6 +73,8 @@ class Simula
     {
         long era_inicial = System.currentTimeMillis();
 
+        critica.log = new ArrayList<Estrutura>();
+
         for(int i = 0; i < agentes.length; i++)
             agentes[i].start();
         
@@ -88,6 +91,8 @@ class Simula
         long era_final = System.currentTimeMillis();
 
         //System.out.println("Main thread terminou!");
+
+        //critica.ordenaEPrinta();
 
         return era_final - era_inicial;
     }

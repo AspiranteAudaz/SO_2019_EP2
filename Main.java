@@ -2,9 +2,8 @@ class Main
 {
     public static void main(String args[])
     {
-
         int num_agentes  = 100;    
-        int num_leitores = 20;
+        int num_leitores = 80;
 
         String entrada = "./Entrada/bd.txt";
         String saida   = "./Saida/saida.txt";
@@ -12,6 +11,7 @@ class Main
 
         long tempo;
 
+        
         for(int i = 0; i < 101; i++)
         {  
             num_leitores = i;
@@ -27,8 +27,7 @@ class Main
             System.out.println("Media " + (num_agentes - num_leitores) + "E" + num_leitores + "L :" + tempo + "ms");
         }
 
-
-        //sim.Prepara(num_agentes, num_leitores);
-        //sim.Roda();
+        sim.Prepara(num_agentes, num_leitores);
+        sim.Roda();
     }
 }
