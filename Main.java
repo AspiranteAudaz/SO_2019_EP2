@@ -2,8 +2,8 @@ class Main
 {
     public static void main(String args[])
     {
-        int num_agentes  = 100;    
-        int num_leitores = 80;
+        int num_agentes  = 100;
+        int num_leitores = 0;
 
         String entrada = "./Entrada/bd.txt";
         String saida   = "./Saida/saida.txt";
