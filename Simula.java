@@ -17,11 +17,12 @@ class Simula
         PegaRecursos(entrada);
     }
 
+    //Carrega a area critica com o arquivo
     private void PegaRecursos(String entrada)
     {
         //Le as linhas do arquivo
         Vector<String> linhas = es.ParsaPalavras(es.CarregaArquivo(entrada));
-
+        
         // DEBUG
         //DebugaLinhas(linhas);
 
@@ -33,6 +34,7 @@ class Simula
         critica = new Area(recursos);
     }
 
+    //Popula vetor agentes
     private void GeraAgentes(int num_agentes, int num_leitores)
     {
         int chance         = num_leitores;
@@ -44,12 +46,12 @@ class Simula
         {
             if((num_leitores > 0) && (alea.nextInt(num_agentes) <= chance))
             {
-                agentes[i] = new Agente(Agente.LEITOR); 
+                agentes[i] = new Agente(critica, Agente.LEITOR, Agente.LEITOR_STR, i); 
                 num_leitores--;
             }
             else if(num_escritores > 0)
-            {
-                agentes[i] = new Agente(Agente.ESCRITOR);
+            {           
+                agentes[i] = new Agente(critica, Agente.ESCRITOR, Agente.ESCRITOR_STR, i);
                 num_escritores--;
             }
             else
@@ -66,9 +68,28 @@ class Simula
         //DebugNumeroAgentes();
     }
 
-    void Roda()
+    long Roda()
     {
+        long era_inicial = System.currentTimeMillis();
 
+        for(int i = 0; i < agentes.length; i++)
+            agentes[i].start();
+        
+        try
+        {
+            for(int i = 0; i < agentes.length; i++)
+            agentes[i].join();
+        }
+        catch(Exception ex)
+        {
+            System.out.println(ex.toString());
+        }
+
+        long era_final = System.currentTimeMillis();
+
+        //System.out.println("Main thread terminou!");
+
+        return era_final - era_inicial;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
@@ -90,12 +111,11 @@ class Simula
         }
 
         int num_leitores   = 0;
-
         int num_escritores = 0;
 
         for(int i = 0; i < agentes.length; i++)
         {
-            if(agentes[i].tipo)
+            if(agentes[i].Tipo())
                 num_escritores++;
             else
                 num_leitores++;

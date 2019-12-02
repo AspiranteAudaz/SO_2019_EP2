@@ -1,22 +1,30 @@
-class Agente
+class Agente extends Thread
 {
+    static final boolean ESCRITOR     = true;
+    static final boolean LEITOR       = false;
+    static final String  ESCRITOR_STR = "ESCRITOR";
+    static final String  LEITOR_STR   = "LEITOR";
 
-    static final boolean ESCRITOR = true;
-    static final boolean LEITOR   = false;
+    private final boolean tipo;
+    private final String  name;
+    private final int     id;
 
-    final boolean tipo;
+    Area area;
 
-    Agente(boolean tipo)
+    Agente(Area area, boolean tipo, String tipo_str, int num)
     {
+        this.area = area;
         this.tipo = tipo;
+        this.id   = num;
+        this.name = tipo_str + "_" + num;
     }
 
     String TipoString()
     {
         if(tipo)
-            return "Leitor";
+            return ESCRITOR_STR;
         
-        return "Escritor";
+        return LEITOR_STR;
     }
     
     boolean Tipo()
@@ -24,9 +32,9 @@ class Agente
         return tipo;
     }
 
-    void Escreve(Area area, Recurso rec, int pos) throws Exception
+    void Escreve(Recurso rec, int pos) throws Exception
     {
-        if(tipo)
+        if(!tipo)
             throw new Exception("Este agente nao e um escritor.");
 
         try
@@ -39,9 +47,9 @@ class Agente
         }
     }
 
-    Recurso Le(Area area, int pos) throws Exception
+    Recurso Le(int pos) throws Exception
     {
-        if(!tipo)
+        if(tipo)
             throw new Exception("Este agente nao e um leitor.");
 
         try
@@ -53,5 +61,10 @@ class Agente
             System.out.println(ex.toString());
             return null;
         }
+    }
+
+    public void run()
+    {
+        //System.out.println(name + " terminou.");
     }
 }

@@ -1,6 +1,7 @@
 class Area
 {
-    private Recurso buffer[];
+    static final int SLEEP_TIME   = 1;
+    private Recurso  buffer[];
 
     Area(int num_recursos)
     {
