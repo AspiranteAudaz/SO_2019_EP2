@@ -10,6 +10,7 @@ class Main
         Simula sim     = new Simula(entrada, Area.IMP_01);
         //Simula sim     = new Simula(entrada, Area.IMP_02);
         //Simula sim     = new Simula(entrada, Area.SEM_LE);
+        
         long tempo;
 
         for(int i = 0; i < 101; i++)
