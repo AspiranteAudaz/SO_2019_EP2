@@ -2,14 +2,23 @@ import java.util.ArrayList;
 
 class Agente extends Thread
 {
+    //flags de escritor/leitor
     static final boolean ESCRITOR     = true;
     static final boolean LEITOR       = false;
+
+    //descricao de escritor/leitor
     static final String  ESCRITOR_STR = "ESCRITOR";
     static final String  LEITOR_STR   = "LEITOR";
+
+    //o que escrever
     static final String  DADO_ESCREVE = "MODIFICADO";
+
+    //quantos ms dormir
     static final int     SLEEP_TIME   = 1;
 
     ArrayList<Estrutura> log;
+
+    //dados de cada agente
     private final boolean tipo;
     private final String  name;
     private final int     id;
@@ -26,6 +35,7 @@ class Agente extends Thread
         rec = new Recurso(DADO_ESCREVE);
     }
 
+    //retorna o tipo string do agente
     String TipoString()
     {
         if(tipo)
@@ -34,11 +44,13 @@ class Agente extends Thread
         return LEITOR_STR;
     }
     
+    //retorna o tipo do arquivo
     boolean Tipo()
     {
         return tipo;
     }
 
+    //Logs auxiliares
     void LogL()
     {
         area.LogS(name);
@@ -93,18 +105,23 @@ class Agente extends Thread
 
     public void run()
     {
+        //Execucao com implementacao Sem leitores e escritores
         if(area.IMPLEMENTACAO == area.SEM_LE)
         {
             SemLE();
             return;
         }
 
+        //Execucao com implementacoes 1 (readers) e 2 (writers)
         if(tipo)
         {
             try
             {
+                //Escreve na base
                 area.Escreve(rec, name);
+                //Dorme (validacao especificada)
                 try{Thread.sleep(SLEEP_TIME);}catch(Exception ex){System.out.println(ex.toString());};
+                //Sai da base
                 area.PararEscrever(name);
             }
             catch(Exception ex)
@@ -116,8 +133,11 @@ class Agente extends Thread
         {
             try
             {
+                //Escreve na base
                 area.Le(name);
+                //Dorme (validacao especificada)
                 try{Thread.sleep(SLEEP_TIME);}catch(Exception ex){System.out.println(ex.toString());};
+                //Sai da base
                 area.PararLer(name);
             }
             catch(Exception ex)

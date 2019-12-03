@@ -3,18 +3,27 @@ import java.util.ArrayList;
 
 class Area
 {
+    //Flags de implementacao
     static final char SEM_LE  = 'S';
     static final char IMP_01  = '1';
     static final char IMP_02  = '2';
     static final int  ACESSOS = 100;
     char IMPLEMENTACAO;
 
+    //Buffer de dados
     private Recurso  buffer[];
+
+    //Gerador de num aleatorios
     private Random   alea = new Random();
+
+    //Lista de estruturas do log (so para debug)
     ArrayList<Estrutura> log;
+
+    //Variaveis do algoritmo
     boolean escritores = false;
     int     leitores   = 0;
 
+    //Logs auxiliares
     void Log(String val)
     {
         System.out.println(val);
@@ -56,11 +65,13 @@ class Area
         this.buffer = buffer;
     }
 
+    //Gera posicao aleatoria do buffer
     int NextPos()
     {
         return alea.nextInt(buffer.length);
     }
 
+    //Condicao (true) se no momento um leitor pode ler a area
     boolean PodeLer()
     {
         if(IMPLEMENTACAO == '1')
@@ -78,6 +89,7 @@ class Area
         }
     }
 
+    //Condicao (true) se no momento um escritor pode escrever na area
     boolean PodeEscrever()
     {
         if(IMPLEMENTACAO == '1')
@@ -95,6 +107,7 @@ class Area
         }
     }
 
+    //Le a area normalmente ACESSO vezes
     void LeDesync()
     {
         Recurso rec;
@@ -109,6 +122,7 @@ class Area
         }
     }
 
+    //Escreve na area normalmente ACESSO vezes
     void EscreveDesync(Recurso rec)
     {   
         try
@@ -122,6 +136,7 @@ class Area
         }
     }
 
+    //Le a area ACESSO vezes de forma sincronizada
     synchronized void Le(String name) throws Exception
     {
         LogC(name);
@@ -130,6 +145,7 @@ class Area
         {
             try 
             {
+                //Dorme
                 wait();
             } catch (InterruptedException e) 
             {
@@ -140,7 +156,8 @@ class Area
 
         LeDesync();
     }
-
+     
+    //Escreve na area ACESSO vezes de forma sincronizada
     synchronized void Escreve(Recurso rec, String name) throws Exception
     {
         LogC(name);
@@ -161,6 +178,7 @@ class Area
         EscreveDesync(rec);
     }
 
+    //Saida da area critica (leitor) e acorda as outras threads
     synchronized void PararLer(String name)
     {
         leitores--;
@@ -168,6 +186,7 @@ class Area
         notifyAll();
     }
 
+    //Saida da area critica (escritor) e acorda as outras threads
     synchronized void PararEscrever(String name)
     {
         escritores = false;
@@ -175,6 +194,7 @@ class Area
         notifyAll();
     }
 
+    //Metodo auxiliar de debug para ordenar a saida linearmente pelo tempo
     void ordenaEPrinta()
     {
         ArrayList<Estrutura> array = log;
